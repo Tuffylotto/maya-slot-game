@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maya Slot Game</title>
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Game logic (read‑only) -->
+  <script type="module" src="js/game.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Maya Slot Game</h1>
+
+    <div class="slot-machine">
+      <div class="slot" id="slot1">0</div>
+      <div class="slot" id="slot2">0</div>
+      <div class="slot" id="slot3">0</div>
+    </div>
+  </div>
+  <script type="module">
+  // Your Firebase config here
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+  apiKey: "AIzaSyAV-3T98ZzM4v2XtnArYhv1qlGIRfmhs8w",
+  authDomain: "maya-slot-game-69f55.firebaseapp.com",
+  databaseURL: "https://maya-slot-game-69f55-default-rtdb.firebaseio.com",
+  projectId: "maya-slot-game-69f55",
+  storageBucket: "maya-slot-game-69f55.firebasestorage.app",
+  messagingSenderId: "805034138677",
+  appId: "1:805034138677:web:053209d9f3f11bf77ae57c",
+  measurementId: "G-HJWJ08NES2"
+};
+
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase();
+
+  // Listen for command
+  const commandRef = ref(db, 'command');
+  onValue(commandRef, (snapshot) => {
+    const value = snapshot.val();
+    console.log("Command from admin:", value);
+
+    if (value === 'spin') {
+      // Call your slot spin function here
+      startSpin();
+    }
+  });
+
+  function startSpin() {
+    // Code that makes your slots spin
+    console.log("Spinning slots!");
+  }
+</script>
+</body>
+</html>
