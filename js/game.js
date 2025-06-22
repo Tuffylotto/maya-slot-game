@@ -5,43 +5,41 @@ const slot1 = document.getElementById('slot1');
 const slot2 = document.getElementById('slot2');
 const slot3 = document.getElementById('slot3');
 
-// 🎞 Animation function
-function animateSlots() {
-  [slot1, slot2, slot3].forEach(slot => {
-    slot.classList.add('spin');
-    setTimeout(() => {
-      slot.classList.remove('spin');
-    }, 1000);
-  });
+let spinInterval = null;
+
+// 🎰 Start spinning random numbers
+function startSpinning() {
+  if (spinInterval) return; // already spinning
+
+  spinInterval = setInterval(() => {
+    slot1.textContent = Math.floor(Math.random() * 10);
+    slot2.textContent = Math.floor(Math.random() * 10);
+    slot3.textContent = Math.floor(Math.random() * 10);
+  }, 100); // change every 100ms
 }
 
-// 🔁 Listen for spin command from admin
+// 🛑 Stop spinning and show result from Firebase
+function stopSpinningAndShowResult(result) {
+  clearInterval(spinInterval);
+  spinInterval = null;
+
+  slot1.textContent = result.slot1;
+  slot2.textContent = result.slot2;
+  slot3.textContent = result.slot3;
+}
+
+// 🔁 Listen for "spin" command
 onValue(ref(db, 'command'), (snapshot) => {
   const cmd = snapshot.val();
   if (cmd === 'spin') {
-    slot1.textContent = "🎰";
-    slot2.textContent = "🎰";
-    slot3.textContent = "🎰";
-    animateSlots();
+    startSpinning(); // Start spinning
   }
 });
 
-// ✅ Listen for result update from admin
+// ✅ Listen for "result" values
 onValue(ref(db, 'result'), (snapshot) => {
   const result = snapshot.val();
   if (result) {
-    slot1.textContent = result.slot1;
-    slot2.textContent = result.slot2;
-    slot3.textContent = result.slot3;
-    animateSlots();
-  }
-});
-onValue(ref(db, 'command'), (snapshot) => {
-  const cmd = snapshot.val();
-  if (cmd === 'spin') {
-    slot1.textContent = "🎰";
-    slot2.textContent = "🎰";
-    slot3.textContent = "🎰";
-    animateSlots();
+    stopSpinningAndShowResult(result); // Stop and show result
   }
 });
