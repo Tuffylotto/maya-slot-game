@@ -1,46 +1,33 @@
 import { db } from './firebase-config.js';
-import { ref, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { ref, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// Get button elements
-const stopButton = document.getElementById("stopButton");
 const spinButton = document.getElementById("spinButton");
+const stopButton = document.getElementById("stopButton");
 
-// 🚦 Stop/Set button: sends result to Firebase
+spinButton.addEventListener("click", () => {
+  set(ref(db, 'command'), 'spin')
+    .then(() => remove(ref(db, 'result')))
+    .then(() => alert("▶ Spinning started"))
+    .catch(err => alert("❌ Error: " + err.message));
+});
+
 stopButton.addEventListener("click", () => {
-  const num1 = document.getElementById("num1").value;
-  const num2 = document.getElementById("num2").value;
-  const num3 = document.getElementById("num3").value;
+  const num1 = parseInt(document.getElementById("num1").value);
+  const num2 = parseInt(document.getElementById("num2").value);
+  const num3 = parseInt(document.getElementById("num3").value);
 
-  if (num1 === "" || num2 === "" || num3 === "") {
-    alert("❗ Please enter all 3 slot numbers");
+  if (isNaN(num1) || isNaN(num2) || isNaN(num3)) {
+    alert("❗ Please enter valid numbers");
     return;
   }
 
   const result = {
-    slot1: parseInt(num1),
-    slot2: parseInt(num2),
-    slot3: parseInt(num3)
+    slot1: num1,
+    slot2: num2,
+    slot3: num3
   };
 
   set(ref(db, 'result'), result)
-    .then(() => alert("✅ Slots set successfully"))
-    .catch(err => alert("❌ Error: " + err.message));
-});
-
-// ▶ Spin button: tells game to keep spinning
-spinButton.addEventListener("click", () => {
-  set(ref(db, 'command'), 'spin')
-    .then(() => alert("▶ Spin started"))
-    .catch(err => alert("❌ Error: " + err.message));
-});
-// ▶ Spin button: tells game to spin and clears old result
-spinButton.addEventListener("click", () => {
-  // Set "spin" command
-  set(ref(db, 'command'), 'spin')
-    .then(() => {
-      // Clear the result
-      return set(ref(db, 'result'), null);
-    })
-    .then(() => alert("▶ Spin started"))
+    .then(() => alert("🛑 Result set"))
     .catch(err => alert("❌ Error: " + err.message));
 });
