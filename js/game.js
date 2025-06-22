@@ -1,56 +1,38 @@
-import { db }           from "./firebase-config.js";
+import { db } from './firebase-config.js';
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const slots = [
-  document.getElementById("slot1"),
-  document.getElementById("slot2"),
-  document.getElementById("slot3")
-];
+const slot1 = document.getElementById('slot1');
+const slot2 = document.getElementById('slot2');
+const slot3 = document.getElementById('slot3');
 
-let intervals = [];
-
-/* ── fast spin ────────────────────────────────────── */
-function spinSlots() {
-  intervals.forEach(clearInterval);
-  intervals = slots.map(slot =>
-    setInterval(() => {
-      slot.textContent = Math.floor(Math.random() * 10);
-    }, 100)
-  );
+// 🎞 Animation function
+function animateSlots() {
+  [slot1, slot2, slot3].forEach(slot => {
+    slot.classList.add('spin');
+    setTimeout(() => {
+      slot.classList.remove('spin');
+    }, 1000);
+  });
 }
 
-/* ── slow down for a dramatic stop ─────────────────── */
-function gradualStop(index, number, delay) {
-  setTimeout(() => {
-    clearInterval(intervals[index]);
+// 🔁 Listen for spin command from admin
+onValue(ref(db, 'command'), (snapshot) => {
+  const cmd = snapshot.val();
+  if (cmd === 'spin') {
+    slot1.textContent = "🎰";
+    slot2.textContent = "🎰";
+    slot3.textContent = "🎰";
+    animateSlots();
+  }
+});
 
-    let steps = 10, speed = 100;
-    (function slow() {
-      if (steps-- > 0) {
-        slots[index].textContent = Math.floor(Math.random() * 10);
-        speed += 50;
-        setTimeout(slow, speed);
-      } else {
-        slots[index].textContent = number;
-      }
-    })();
-  }, delay);
-}
-
-/* ── start immediately ────────────────────────────── */
-spinSlots();
-
-/* ── listen to admin commands in real time ────────── */
-onValue(ref(db, "command"), snap => {
-  const cmd = snap.val();
-  if (!cmd) return;
-
-  if (cmd.action === "spin") {
-    spinSlots();
-  } else if (cmd.action === "stop") {
-    const [a, b, c] = cmd.numbers;
-    gradualStop(2, c, 0);      // right
-    gradualStop(1, b, 3000);   // middle 3 s later
-    gradualStop(0, a, 6000);   // left   6 s later
+// ✅ Listen for result update from admin
+onValue(ref(db, 'result'), (snapshot) => {
+  const result = snapshot.val();
+  if (result) {
+    slot1.textContent = result.slot1;
+    slot2.textContent = result.slot2;
+    slot3.textContent = result.slot3;
+    animateSlots();
   }
 });
