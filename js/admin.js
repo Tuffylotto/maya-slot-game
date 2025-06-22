@@ -33,3 +33,14 @@ spinButton.addEventListener("click", () => {
     .then(() => alert("▶ Spin started"))
     .catch(err => alert("❌ Error: " + err.message));
 });
+// ▶ Spin button: tells game to spin and clears old result
+spinButton.addEventListener("click", () => {
+  // Set "spin" command
+  set(ref(db, 'command'), 'spin')
+    .then(() => {
+      // Clear the result
+      return set(ref(db, 'result'), null);
+    })
+    .then(() => alert("▶ Spin started"))
+    .catch(err => alert("❌ Error: " + err.message));
+});

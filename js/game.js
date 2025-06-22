@@ -36,3 +36,12 @@ onValue(ref(db, 'result'), (snapshot) => {
     animateSlots();
   }
 });
+onValue(ref(db, 'command'), (snapshot) => {
+  const cmd = snapshot.val();
+  if (cmd === 'spin') {
+    slot1.textContent = "🎰";
+    slot2.textContent = "🎰";
+    slot3.textContent = "🎰";
+    animateSlots();
+  }
+});
